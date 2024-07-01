@@ -6,7 +6,7 @@ import { TweenMax } from "gsap";
 
 const PageWrapper = styled.div`
   width: 100%;
-  min-height: 100vh;
+  min-height: 100%;
 `;
 
 const Dog = styled.p.attrs<{ $x: number; $y: number }>((props) => ({
