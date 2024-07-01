@@ -1,79 +1,65 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import React, { useState, useRef, useEffect } from "react";
+import styled from "styled-components";
+import { TweenMax } from "gsap";
+
+const PageWrapper = styled.div`
+  width: 100%;
+  min-height: 100vh;
+`;
+
+const Dog = styled.p.attrs<{ $x: number; $y: number }>((props) => ({
+  style: {
+    left: `${props.$x}px`,
+    top: `${props.$y}px`,
+  },
+}))`
+  position: absolute;
+`;
+
+const lerp = (start: number, end: number, factor: number) => {
+  return (end - start) * factor;
+};
+
+const Page = () => {
+  const [x, setX] = useState(0);
+  const [y, setY] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
+  const [currentY, setCurrentY] = useState(0);
+  const dogRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentX((prevX) => lerp(prevX, x, 0.1));
+      setCurrentY((prevY) => lerp(prevY, y, 0.1));
+
+      TweenMax.to(dogRef.current, 0.5, {
+        x: currentX,
+        y: currentY,
+        ease: "power2.out",
+      });
+    }, 33.33); // 約30fps (1000ms / 30)
+
+    return () => clearInterval(interval);
+  }, [x, y, currentX, currentY]);
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const newX = e.clientX - e.currentTarget.getBoundingClientRect().left;
+    const newY = e.clientY - e.currentTarget.getBoundingClientRect().top;
+
+    setX(Math.round(newX));
+    setY(Math.round(newY));
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image src="/vercel.svg" alt="Vercel Logo" className={styles.vercelLogo} width={100} height={24} priority />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image className={styles.logo} src="/next.svg" alt="Next.js Logo" width={180} height={37} priority />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>Instantly deploy your Next.js site to a shareable URL with Vercel.</p>
-        </a>
-      </div>
+    <main>
+      <PageWrapper onMouseMove={handleMouseMove}>
+        <Dog ref={dogRef} $x={currentX} $y={currentY}>
+          犬
+        </Dog>
+      </PageWrapper>
     </main>
   );
-}
+};
+
+export default Page;
