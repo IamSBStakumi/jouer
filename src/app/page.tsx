@@ -19,7 +19,7 @@ const Dog = styled.p.attrs<{ $x: number; $y: number }>((props) => ({
 `;
 
 const lerp = (start: number, end: number, factor: number) => {
-  return (end - start) * factor;
+  return start + (end - start) * factor;
 };
 
 const Page = () => {
